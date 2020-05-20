@@ -9,7 +9,7 @@ _Summarize the goal of your work and what motivated it_
 
 # Related links
 - _List links to related ticket(s)_
-- _(optional) Link to other files and resources, such as specific related reports in a BI tool
+- _(optional) Link to other files and resources, such as specific related reports in a BI tool_
 
 # Checklist
 - [ ] All models, whether directly changed by this model or not, run successfully
@@ -20,4 +20,3 @@ _Summarize the goal of your work and what motivated it_
     _Check one:_
     - [ ] There are no new test failures, whether or not the existing model was intentionally changed for this PR
     - [ ] This PR causes new test failures and there is a plan in place for addressing them
-
