@@ -14,7 +14,7 @@ _Summarize the goal of your work and what motivated it_
 # Checklist
 - [ ] All models, whether directly changed by this PR or not, run successfully
 - [ ] New code follows [dbt coding conventions](https://github.com/brooklyn-data/co/blob/master/dbt_coding_conventions.md) and [SQL style guide](https://github.com/brooklyn-data/co/blob/master/sql_style_guide.md)
-- [ ] Testing
+- [ ] Testing:
     - [ ] All added/modified models and columns are documented and tested in `schema.yml` files
     - [ ] All tests pass **OR**
     _Check one:_
