@@ -345,6 +345,31 @@ inner join orders on customers.id = orders.customer_id
 
 <br>
 
+#### When inner joining, put filter conditions in the `where` clause instead of the `join` clause.
+Only join conditions should be put in a `join` clause. All filter conditions should be put together in the `where` clause. 
+
+```sql
+/* Good */
+select
+    ...
+from orders
+inner join customers on orders.customer_id = customers.id
+where
+    orders.total_amount >= 100
+    and customers.email like '%@domain.com'
+
+/* Bad */
+select
+    ...
+from orders
+inner join customers on
+    orders.customer_id = customers.id
+    and customers.email like '%@domain.com'
+where orders.total_amount >= 100
+```
+
+<br>
+
 ### CTEs
 
   - Where performance permits, CTEs should perform a single, logical unit of work.
@@ -560,18 +585,18 @@ left join orders
 from customers
 left join orders on
     customers.id = orders.customer_id
-    and orders.total_amount > 100
+    and customers.region_id = orders.region_id
 
 /* Bad */
 from customers
 left join orders on customers.id = orders.customer_id
-    and orders.total_amount > 100
+    and customers.region_id = orders.region_id
 
 /* Bad */
 from customers
 left join orders
     on customers.id = orders.customer_id
-    and orders.total_amount > 100
+    and customers.region_id = orders.region_id
 ```
 
 <br>
