@@ -386,10 +386,13 @@ CTEs will make your queries more straightforward to read/reason about, can be re
 /* Good */
 with
     paying_customers as (
+
         select *
         from customers
         where plan_name != 'free'
+
     )
+
 select ...
 from paying_customers
 
@@ -483,12 +486,19 @@ If code containing commas needs to be split across multiple lines, put the comma
 ```sql
 /* Good */
 with
+
     customers as (
+
         ...
+
     )
+
     , paying_customers as (
+
         ...
+
     )
+
 select
     id
     , email
@@ -503,11 +513,17 @@ where email in (
 /* Bad */
 with
     customers as (
+
         ...
+
     ),
+
     paying_customers as (
+
         ...
+
     )
+
 select
     id,
     email,
@@ -667,44 +683,62 @@ order by plan_name
 /* Good */
 with
     paying_customers as (
+
         select ...
         from customers
+
     )
+
 select ...
 from paying_customers
 
 /* Bad */
 with paying_customers as (
+
     select ...
     from customers
+
 )
+
 select ...
 from paying_customers
 
 /* Good */
 with
     paying_customers as (
+
         select ...
         from customers
+
     )
+
     , paying_customers_per_month as (
         /* CTE comments... */
+
         select ...
         from paying_customers
+
     )
+
 select ...
 from paying_customers_per_month
 
 /* Bad */
 with paying_customers as (
+
         select ...
         from customers
+
     )
+
     /* CTE comments... */
     , paying_customers_per_month as (
+
         select ...
         from paying_customers
+
       )
+
 select ...
 from paying_customers_per_month
 ```
