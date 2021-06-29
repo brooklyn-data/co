@@ -1,12 +1,15 @@
 # Brooklyn Data Co. dbt coding conventions
 
   - [General guidelines](#general-guidelines)
+  - [Project structure](#project-structure)
+    - [Marts directory](#marts-directory)
+    - [Sources directory](#sources-directory)
   - [Profiles](#profiles)
   - [Projects](#projects)
     - [Files](#files)
     - [dbt_project.yml files](#dbt_projectyml-files)
   - [Packages](#packages)
-  - [Sources](#sources)
+  - [dbt Sources](#dbt-sources)
   - [Models](#models)
     - [Schemas](#schemas)
     - [schema.yml files](#schemayml-files)
@@ -63,6 +66,91 @@ dbt's built-in `generate_schema_name_for_env` macro assumes production targets a
 
 #### Production targets should not be set as the default in developers' profiles.
 Developers should target a dev environment by default.
+
+<br>
+
+## Project structure
+
+Projects should have a directory structure per the following example.
+
+```
+.
+├── README.md
+├── analysis
+├── dbt_project.yml
+├── macros
+├── models
+│   ├── marts
+│   │   ├── core
+│   │   │   ├── monthly_product_revenue.sql
+│   │   │   ├── monthly_product_revenue.yml
+│   │   │   ├── payments.sql
+│   │   │   ├── payments.yml
+│   │   │   ├── customers.sql
+│   │   │   ├── customers.yml
+│   │   │   └── intermediate
+│   │   │       ├── int_customers.sql
+│   │   │       ├── int_customers.yml
+│   │   │       ├── int_payments.sql
+│   │   │       └── int_payments.yml
+│   │   ├── marketing
+│   │   │   ├── page_hits.sql
+│   │   │   ├── page_hits.yml
+│   │   │   ├── sessions.sql
+│   │   │   ├── sessions.yml
+│   │   │   ├── users.sql
+│   │   │   ├── users.yml
+│   │   │   └── intermediate
+│   │   │       ├── int_sessions.sql
+│   │   │       ├── int_sessions.yml
+│   │   │       ├── int_users.sql
+│   │   │       └── int_users.yml
+│   │   └── etc.
+│   ├── sources
+│   │   ├── google_analytics
+│   │   │   ├── source_google_analytics.yml
+│   │   │   ├── source_google_analytics__ga_campaign.sql
+│   │   │   └── source_google_analytics__ga_orders.sql
+│   │   ├── stripe
+│   │   │   ├── source_stripe.yml
+│   │   │   ├── source_stripe__users.sql
+│   │   │   ├── source_stripe__payments.sql
+│   │   │   └── source_stripe__refunds.sql
+│   │   └── etc.
+│   └── utils
+├── packages.yml
+├── seeds
+└── snapshots
+```
+
+<br>
+
+### Marts directory
+
+The marts directory should contain a directory for each _business-centric_ mart required. Marts model business processes. For some projects, there may be only a core mart. Mart directories contain schema definitions and tests in correspondingly named `.yml` files for each model.
+
+<br>
+
+#### Intermediate directories
+
+Intermediate (`int_`) models are used to provide an additional layer of business modelling before final mart models. They are useful when mart model is becoming unwieldy in its complexity, or to create an abstraction for use by several mart models. Intermediate models are not to be dependend on outside of the dbt project.
+
+<br>
+
+### Sources directory
+
+The sources directory should contain a directory for each set of _source-centric_ models. These models create an abstraction on top of source data for easier use in marts. Source models are not to be confused with dbt sources - source models are a layer above dbt sources. A `<source_name>.yml` file defining the dbt sources should exist within each source-specific directory.
+
+#### `source_` models
+Source models should be named `source_<source name>__<table name>` (two underscores between the source name and table name because those names may contain underscores themselves).
+
+  - Source models are the first layer of modelling on top of source data.
+  - They are normally materialized as views.
+  - All dbt sources should have a corresponding source model, though not necessarily the other way around:
+  - Source models can build on top of other source models, e.g. in Shopify to create an order_items source table by unnesting the order table's order_items field.
+  - Source models should select from [dbt sources](https://docs.getdbt.com/docs/using-sources), not directly from the source tables themselves.
+  - Source models should alias source columns as necessary to conform to our [naming conventions](sql_style_guide.md).
+  - Source models should perform data type corrections and simple extractions of nested scalar data.
 
 <br>
 
@@ -175,12 +263,12 @@ This allows bug fixes to be picked up automatically while avoiding any unexpecte
 # Good
 packages:
   - package: fishtown-analytics/dbt_utils
-    version: [">=0.1.0", "<0.2.0"]
+    version: [">=0.6.0", "<0.7.0"]
 
 # Bad
 packages:
   - package: fishtown-analytics/dbt_utils
-    version: 0.1.17
+    version: 0.6.5
 
 # Bad
 packages:
@@ -190,7 +278,7 @@ packages:
 
 <br>
 
-## Sources
+## dbt Sources
 
 #### Each [dbt source](https://docs.getdbt.com/docs/using-sources) should be defined in its own `schema.yml` file named `<source name>.yml`.
 Sources have some nice features:
@@ -203,37 +291,8 @@ Sources have some nice features:
 
 ## Models
 
-#### Model naming conventions:
-  - Model names should be plurals (tables are collections of multiple things).
-  - Source models should be named `<source name>__<table name>` (two underscores between the source name and table name because those names may contain underscores themselves).
-  - Staging model names should be prefixed with `stage_`.
-  - Dimension model names should be prefixed with `dim_`.
-  - Fact model names should be prefixed with `fact_`.
-  - Aggregate model names should be prefixed with `agg_`.
-  - Bridge model names should be prefixed with `bridge_`.
-
-<br>
-
-#### Only source models should select from sources.
-  - Source models should select from [dbt sources](https://docs.getdbt.com/docs/using-sources), not directly from the source tables themselves.
-  - All other models should only select from other models.
-
-```sql
-/* Good */
-select ...
-from {{ source('web', 'pageview') }}
-
-/* Bad */
-select ...
-from web.pageview
-```
-
-<br>
-
-#### Source models should alias source columns as necessary to conform to our naming conventions.
-For example, source column names that conflict with reserved words must be aliased to a different name.
-
-<br>
+#### Model names should be plural
+Tables are collections of multiple things.
 
 #### Most models should have a single primary key column.
 This makes joins easier and more performant.
@@ -313,10 +372,10 @@ Permissions should be set for the "sensitive" schema to restrict access as appro
 
 <br>
 
-### `schema.yml` files
+### Schema `.yml` files
 
-#### Documentation and tests for each model should be placed in a `schema.yml` file alongside the model file named `<model name>.yml`.
-Having a separate `schema.yml` file for each model has several benefits:
+#### Documentation and tests for each model should be placed in a schema `.yml` file alongside the model file named `<model name>.yml`.
+Having a separate schema `.yml` file for each model has several benefits:
   - Makes it easier to find the documentation and tests for a model.
   - Clearly shows which models have documentation/tests and which don't.
   - Helps avoid version control merge conflicts.
@@ -328,10 +387,10 @@ Testing and documenting models should be an integral part of their development.
 
 <br>
 
-#### Columns should be listed in `schema.yml` files in the same order they appear in their model.
-This makes it easier to correlate between the model and the `schema.yml` file.
+#### Columns should be listed in schema `.yml` files in the same order they appear in their model.
+This makes it easier to correlate between the model and the schema `.yml` file.
 
-Also, if comments are used in the model to label groupings of columns, consider putting matching comments in the `schema.yml` file.
+Also, if comments are used in the model to label groupings of columns, consider putting matching comments in the schema `.yml` file.
 
 <br>
 
