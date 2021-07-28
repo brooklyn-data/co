@@ -302,6 +302,47 @@ This makes joins easier and more performant.
 
 <br>
 
+#### Model output columns should be separated into logical groups.
+Use comments to label column groups with a blank line between each group. This provides a quickly interpretable structure for columns.
+
+Our standard output column groups (where applicable, always in this order):
+  - `Primary key`
+  - `Foreign keys and IDs`
+  - `Timestamps`
+  - Any other groups as makes sense. A common catch-all is `Status and properties`. Other good examples are `Metrics` and `Costs and quantities`.
+
+```sql
+/* Good */
+select
+    /* Primary key */
+    id
+
+    /* Foreign keys and IDs */
+    , customer_id
+    , region_id
+
+    /* Timestamps */
+    , created_at
+
+    /* Status and properties */
+    , status
+    , total_amount
+
+from orders
+
+/* Bad */
+select
+    id
+    , created_at
+    , customer_id
+    , region_id
+    , status
+    , total_amount
+from orders
+```
+
+<br>
+
 #### Model-specific attributes should be specified directly in the model.
 For example, sort and dist keys for Redshift:
 ```sql
@@ -390,7 +431,7 @@ Testing and documenting models should be an integral part of their development.
 #### Columns should be listed in schema `.yml` files in the same order they appear in their model.
 This makes it easier to correlate between the model and the schema `.yml` file.
 
-Also, if comments are used in the model to label groupings of columns, consider putting matching comments in the schema `.yml` file.
+Also, if comments are used in the model to label groupings of columns, then put matching comments in the schema `.yml` file.
 
 <br>
 
