@@ -547,6 +547,7 @@ with
         from customers
         where plan_name != 'free'
     )
+
 select ...
 from paying_customers
 
@@ -891,7 +892,7 @@ order by plan_name
 
 #### CTEs:
   - Start each CTE on its own line, indented one level more than `with` (including the first one, and even if there is only one).
-  - Put all closing parentheses at the same indentation level as the first CTE.
+  - Use a single blank line around CTEs to add visual separation.
   - Put any comments about the CTE within the CTE's parentheses, at the same indentation level as the `select`.
 
 ```sql
@@ -901,13 +902,16 @@ with
         select ...
         from customers
     )
+
 select ...
 from paying_customers
 
 /* Bad */
 with paying_customers as (
+
     select ...
     from customers
+
 )
 select ...
 from paying_customers
@@ -918,24 +922,32 @@ with
         select ...
         from customers
     )
+
     , paying_customers_per_month as (
         /* CTE comments... */
         select ...
         from paying_customers
     )
+
 select ...
 from paying_customers_per_month
 
 /* Bad */
 with paying_customers as (
+
         select ...
         from customers
+
     )
+
     /* CTE comments... */
     , paying_customers_per_month as (
+
         select ...
         from paying_customers
+
       )
+
 select ...
 from paying_customers_per_month
 ```
