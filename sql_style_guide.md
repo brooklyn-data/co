@@ -4,6 +4,7 @@
   - [Syntax](#syntax)
     - [Aliases](#aliases)
     - [Joins](#joins)
+    - [Case statements](#case-statements)
     - [CTEs](#ctes)
   - [Formatting](#formatting)
   - [Credits](#credits)
@@ -346,7 +347,7 @@ inner join orders on customers.id = orders.customer_id
 <br>
 
 #### When inner joining, put filter conditions in the `where` clause instead of the `join` clause.
-Only join conditions should be put in a `join` clause. All filter conditions should be put together in the `where` clause. 
+Only join conditions should be put in a `join` clause. All filter conditions should be put together in the `where` clause.
 
 ```sql
 /* Good */
@@ -366,6 +367,208 @@ inner join customers on
     orders.customer_id = customers.id
     and customers.email like '%@domain.com'
 where orders.total_amount >= 100
+```
+
+<br>
+
+### Case statements
+
+- `then` can be at the end of single-line `when` clauses or go on its own line indented from `when`.
+- `else` should be indented the same amount as the when clauses.
+- `end` is aligned with case.
+- In multi-line `when` clauses all subsequent lines should be indented.
+
+<br>
+
+#### Keep case statements with one short condition on a single line
+
+```sql
+/* Good */
+case when customers.status = 1 then 'Active' else 'Inactive' end as column_name
+
+/* Bad */
+case
+  when customers.status = 1 then 'Active' else 'Inactive'
+end as column_name
+```
+
+<br>
+
+#### Use separate lines for long conditions
+
+Lines should ideally not be longer than 120 characters. If a long condition results in more than 120 characters:
+  - Put each `when` clause on a new line, indented from `case`.
+  - `then` clauses can flow to a new line, indented from the `when` clause.
+  - Put the `else` clause on the same level as the `when` clauses.
+
+```sql
+/* Good */
+case
+    when [very very very very very very very long condition]
+        then [result]
+    else [result]
+end as column_name
+
+/* Bad */
+case when [very very very very very very very long condition] then [result] else [result] end as column_name
+
+/* Bad */
+case when [very very very very very very very long condition]
+    then [result]
+    else [result] end as column_name
+
+```
+
+<br>
+
+#### Use seperate lines when there are multiple conditions
+
+  - Put the conditions on their own lines, indented from `case`.
+  - Put the `else` clause on the same level as the conditions.
+
+```sql
+/* Good*/
+case
+    when orders.status = 1 then 'Completed'
+    when orders.status = 2 then 'Processing'
+    when orders.status = 3 then 'Cancelled'
+    else 'Failed'
+end as column_name
+
+/* Good */
+case orders.status
+    when 1 then 'Completed'
+    when 2 then 'Processing'
+    when 3 then 'Cancelled'
+    else 'Failed'
+end as column_name
+
+/* Bad */
+case orders.status when 1 then 'Completed' when 2 then 'Processing' when 3 then 'Cancelled' else 'Failed' end as column_name
+
+```
+
+<br>
+
+#### Use separate lines for multiple conditions in a when clause
+
+  - Put each `when` clause on a new line, indented from `case`.
+  - Put the first condition on the same line as `when`. Put other conditions in a new line, indented from `when`.
+  - Boolean expressions (`and`, `or` etc.) should be after, not before newlines.
+  - Put the `else` clause on the same level as the `when` conditions.
+
+```sql
+
+/* Good */
+case
+    when
+        orders.refund = 1
+        and orders.total_amount = orders.refund_amount
+        then 'Complete refund'
+    else 'Partial refund'
+end as column_name
+
+/* Bad */
+case
+    when
+        orders.refund = 1 and
+        orders.total_amount = orders.refund_amount
+        then 'Complete refund'
+    else 'Partial refund'
+end as column_name
+```
+
+<br>
+
+#### Use separate lines for conditions with long list matching
+
+For long lists:
+  - Put each `when` clause on a new line, indented from `case`.
+  - List values should be on their own lines, indented from the enclosing `when` condition.
+  - The closing parenthesis and the `then` clause should be aligned with the list.
+
+```sql
+
+/* Good */
+case
+    when
+        plan_name in (
+            'monthly'
+            , 'bimonthly'
+            , 'quarterly'
+            , 'yearly'
+        )
+        then 'Paying customer'
+    else 'Guest customer'
+end as column_name
+
+/* Bad */
+case
+    when plan_name in ('monthly', 'bimonthly', 'quarterly', 'yearly') then 'Paying customer' else 'Guest customer'
+end as column_name
+```
+
+<br>
+
+#### Use separate lines for multi-line then expressions
+
+  - Put the first line of multi-line `then` expressions (macros, formulas, window functions etc.) on the same line as `then`. Subsequent lines should be indented from `then`.
+  - The closing parenthesis should be aligned with the function.
+
+```sql
+/* Window functions */
+case
+    when customer_id is not null
+        then row_number() over (
+            partition by customer_id
+            order by created_at
+        )
+end as column_name
+
+/* Formulas */
+case
+    when shipping_costs_usd > 0
+        then shipping_costs_usd
+            + shipping_taxes_usd
+            + shipping_international_duties_usd
+end as column_name
+```
+
+<br>
+
+#### Be consistent with spacing after a comma
+
+  - When the case statement is preceded by a comma the `end` should be aligned with the comma.
+
+```sql
+/* Good */
+select
+    ...
+    , case
+        when orders.status = 1 then 'Completed'
+        when orders.status = 2 then 'Processing'
+        when orders.status = 3 then 'Cancelled'
+        else 'Failed'
+      end as column_name
+
+/* Bad */
+select
+    ...
+    , case
+        when orders.status = 1 then 'Completed'
+        when orders.status = 2 then 'Processing'
+        when orders.status = 3 then 'Cancelled'
+        else 'Failed'
+    end as column_name
+
+/* Bad */
+select
+    ...
+    , case
+        when [condition] then [result]
+        when [condition] then [result]
+        else [result]
+        end as column_name
 ```
 
 <br>
