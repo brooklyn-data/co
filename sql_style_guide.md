@@ -2,10 +2,10 @@
 
   - [General guidelines](#general-guidelines)
   - [Syntax](#syntax)
-    - [Aliases](#aliases)
     - [Joins](#joins)
     - [Case statements](#case-statements)
     - [CTEs](#ctes)
+  - [Naming](#naming)
   - [Formatting](#formatting)
   - [Credits](#credits)
 
@@ -95,6 +95,32 @@ from customers
 
 #### Use a `case` statement instead of `iff` or `if`.
 `case` statements are universally supported, whereas Redshift doesn't support `iff`, and in BigQuery the function is named `if` instead of `iff`.
+
+<br>
+
+#### Always use the `as` keyword when aliasing columns, expressions, and tables.
+```sql
+/* Good */
+select count(*) as customers_count
+from customers
+
+/* Bad */
+select count(*) customers_count
+from customers
+```
+
+<br>
+
+#### Always alias grouping aggregates and other column expressions.
+```sql
+/* Good */
+select max(id) as max_customer_id
+from customers
+
+/* Bad */
+select max(id)
+from customers
+```
 
 <br>
 
@@ -197,78 +223,6 @@ select *
 from customers
 where email like '''%@domain.com'''
 /* Will probably be interpreted like '\'%domain.com\''. */
-```
-
-<br>
-
-### Aliases
-
-#### Always use the `as` keyword when aliasing columns, expressions, and tables.
-```sql
-/* Good */
-select count(*) as customers_count
-from customers
-
-/* Bad */
-select count(*) customers_count
-from customers
-```
-
-<br>
-
-#### Always alias grouping aggregates and other column expressions.
-```sql
-/* Good */
-select max(id) as max_customer_id
-from customers
-
-/* Bad */
-select max(id)
-from customers
-```
-
-<br>
-
-#### Date/time column aliases:
-  - Date columns based on UTC should be named like `<event>_date`.
-  - Date columns based on a specific timezone should be named like `<event>_date_<timezone indicator>` (e.g. `order_date_et`).
-  - Date+time columns based on UTC should be named like `<event>_at`.
-  - Date+time columns based on a specific timezone should be named like `<event>_at_<timezone indicator>` (e.g `created_at_pt`).
-  - US timezone indicators:
-    - `et` = Eastern Time.
-    - `ct` = Central Time.
-    - `mt` = Mountain Time.
-    - `pt` = Pacific Time.
-
-<br>
-
-#### Boolean column aliases:
-  - Boolean columns should be prefixed with a present or past tense third-person singular verb, such as:
-    - `is_` or `was_`.
-    - `has_` or `had_`.
-    - `does_` or `did_`.
-
-<br>
-
-#### Avoid using unnecessary table aliases, especially initialisms.
-Suggested guidelines:
-  - If the table name consists of 3 words or less don't alias it.
-  - Use a subset of the words as the alias if it makes sense (e.g. if `partner_shipments_order_line_items` is the only line items table being referenced it could be reasonable to alias it as just `line_items`).
-
-```sql
-/* Good */
-select
-    customers.email
-    , orders.invoice_number
-from customers
-inner join orders on customers.id = orders.customer_id
-
-/* Bad */
-select
-    c.email
-    , o.invoice_number
-from customers as c
-inner join orders as o on c.id = o.customer_id
 ```
 
 <br>
@@ -603,6 +557,80 @@ from (
     from customers
     where plan_name != 'free'
 ) as paying_customers
+```
+
+<br>
+
+## Naming
+
+#### Name single-column primary keys `id`.
+This allows us to easily tell at a glance whether a column is a primary key, helps us [discern whether joins are one-to-many or many-to-one](#in-join-conditions-put-the-table-that-was-referenced-first-immediately-after-on), and is more succinct than other primary key naming conventions (particularly in join conditions).
+
+```sql
+/* Good */
+select ...
+from orders
+left join customers on orders.customer_id = customers.id
+/* Easier to tell this is a many-to-one join and thus won't fan out. */
+
+/* Bad */
+select ...
+from orders
+left join customers on orders.customer_id = customers.customer_id
+
+/* Good */
+select ...
+from orders
+left join some_exceedingly_long_name on orders.some_exceedingly_long_name_id = some_exceedingly_long_name.id
+
+/* Bad */
+select ...
+from orders
+left join some_exceedingly_long_name on orders.some_exceedingly_long_name_id = some_exceedingly_long_name.some_exceedingly_long_name_id
+```
+
+<br>
+
+#### Date/time column names:
+  - Date columns based on UTC should be named like `<event>_date`.
+  - Date columns based on a specific timezone should be named like `<event>_date_<timezone indicator>` (e.g. `order_date_et`).
+  - Date+time columns based on UTC should be named like `<event>_at`.
+  - Date+time columns based on a specific timezone should be named like `<event>_at_<timezone indicator>` (e.g `created_at_pt`).
+  - US timezone indicators:
+    - `et` = Eastern Time.
+    - `ct` = Central Time.
+    - `mt` = Mountain Time.
+    - `pt` = Pacific Time.
+
+<br>
+
+#### Boolean column names:
+  - Boolean columns should be prefixed with a present or past tense third-person singular verb, such as:
+    - `is_` or `was_`.
+    - `has_` or `had_`.
+    - `does_` or `did_`.
+
+<br>
+
+#### Avoid using unnecessary table aliases, especially initialisms.
+Suggested guidelines:
+  - If the table name consists of 3 words or less don't alias it.
+  - Use a subset of the words as the alias if it makes sense (e.g. if `partner_shipments_order_line_items` is the only line items table being referenced it could be reasonable to alias it as just `line_items`).
+
+```sql
+/* Good */
+select
+    customers.email
+    , orders.invoice_number
+from customers
+inner join orders on customers.id = orders.customer_id
+
+/* Bad */
+select
+    c.email
+    , o.invoice_number
+from customers as c
+inner join orders as o on c.id = o.customer_id
 ```
 
 <br>
