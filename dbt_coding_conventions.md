@@ -291,8 +291,18 @@ Sources have some nice features:
 
 ## Models
 
-#### Model names should be plural
-Tables are collections of multiple things.
+#### Model naming conventions:
+  - Model names should be plural (tables are collections of multiple things).
+  - Source models should be named `source_<source name>__<table name>` (two underscores between the source name and table name because those names may contain underscores themselves).
+  - Intermediate model names should be prefixed with `int_`.
+  - Bridge model names should be prefixed with `bridge_`.
+  - Aggregate model names should be prefixed with the grain of the aggregation (e.g. `daily_`, `monthly_`).
+  - Don't use fact/dimension prefixes like `fact_` and `dim_`.
+    - Models are easier to find when they are sorted alphabetically by their modelled event/entity without a `fact_` or `dim_` prefix.
+    - Facts and dimensions are not intrinsic properties of models, but are instead determined by the way the model and its columns are used.
+    - We create models optimized for modern columnar databases, which combine denormalized factual and dimensional data to reduce the need for joins.
+
+<br>
 
 #### Most models should have a single primary key column.
 This makes joins easier and more performant.
@@ -443,14 +453,14 @@ One exception is line breaks, where using `<br>` is preferable to hassling with 
 ```yaml
 # Good
 models:
-  - name: fact_orders
+  - name: orders
     description: |
       **Overview:** Summary data for orders.
       <br>**Data sources:** `orders`, `order_line_items`
 
 # Bad
 models:
-  - name: fact_orders
+  - name: orders
     description: |
       <b>Overview:</b> Summary data for orders.
       <br><b>Data sources:</b> <code>orders</code>, <code>order_line_items</code>
