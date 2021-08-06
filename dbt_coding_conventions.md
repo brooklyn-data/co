@@ -305,6 +305,8 @@ Sources have some nice features:
   - Testing source columns.
   - Calculating the freshness of source data.
 
+Sources should have the `description` and `loader` properties completed to give context on the source to future developers.
+
 <br>
 
 ## Models
@@ -448,6 +450,8 @@ Having a separate schema `.yml` file for each model has several benefits:
   - Makes it easier to find the documentation and tests for a model.
   - Clearly shows which models have documentation/tests and which don't.
   - Helps avoid version control merge conflicts.
+
+Final models and source models should be documented. Intermediate models do not require documentation.
 
 <br>
 
