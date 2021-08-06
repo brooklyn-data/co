@@ -240,6 +240,23 @@ models:
 
 <br>
 
+#### Where there is not already an implied order, lists should be in alphabetical order.
+Lists such as accepted values and source table names should be in alphabetical order, except where an order is implied (e.g. the order of columns in a model).
+
+```yaml
+sources:
+  - name: shopify
+    database: stitch
+    tables:
+      - addresses
+      - customers
+      - orders
+      - products
+      - shipments
+```
+
+<br>
+
 ## Packages
 
 #### Use packages from [dbt Hub](https://hub.getdbt.com/) whenever possible.
