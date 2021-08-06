@@ -151,6 +151,7 @@ Source models should be named `source_<source name>__<table name>` (two undersco
   - Source models should select from [dbt sources](https://docs.getdbt.com/docs/using-sources), not directly from the source tables themselves.
   - Source models should alias source columns as necessary to conform to our [naming conventions](sql_style_guide.md).
   - Source models should perform data type corrections and simple extractions of nested scalar data.
+  - In source models, timezones should be cast to the timezone of the client. Where there are multiple timezones for the client, select the timezone in which most of the reporting stakeholders are based.
 
 <br>
 
