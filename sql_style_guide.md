@@ -613,6 +613,15 @@ left join some_exceedingly_long_name on orders.some_exceedingly_long_name_id = s
 
 <br>
 
+#### Columns which represent numeric values with a known unit should be suffixed with that unit.
+Some examples:
+  - `price_usd`
+  - `weight_oz`
+  - `weight_kg`
+  - `weight_grams`
+
+<br>
+
 #### Avoid using unnecessary table aliases, especially initialisms.
 Suggested guidelines:
   - If the table name consists of 3 words or less don't alias it.
