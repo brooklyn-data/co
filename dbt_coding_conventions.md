@@ -125,6 +125,15 @@ Projects should have a directory structure per the following example.
 
 <br>
 
+### What models should and shouldn’t be referenced by other models? dbt: ref()
+- Only source models should select from sources
+- All "end" models should have int models that do most of the transformation work
+- There can be multiple layers in int models
+- Nothing should select from "end" models
+- One possible exception for aggregation rollups
+
+<br>
+
 ### Marts directory
 
 The marts directory should contain a directory for each _business-centric_ mart required. Marts model business processes. For some projects, there may be only a core mart. Mart directories contain schema definitions and tests in correspondingly named `.yml` files for each model.
