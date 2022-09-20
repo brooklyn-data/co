@@ -249,7 +249,7 @@ Optimize for clarity and brevity. Where applicable, keep naming consistent with 
   - `## Statuses`
   - `## Revenue`
   - `## Costs`
-  - `## SLAs`
+  - `## SLAs` - These fields contain Service Level Agreements
   - `## Ratios and Percents`
   - `## Sets`
 
