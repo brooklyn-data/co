@@ -81,14 +81,14 @@ from customers
 
 <br>
 
-#### Use `coalesce` instead of `ifnull` or `nvl`.
+#### Use `coalesce` instead of `isnull`, `ifnull` or `nvl`.
   - `coalesce` is universally supported, whereas Redshift doesn't support `ifnull` and BigQuery doesn't support `nvl`.
   - `coalesce` is more flexible and accepts an arbitrary number of arguments.
 
 <br>
 
 #### Use `is null` instead of `isnull`, and `is not null` instead of `notnull`.
-`isnull` and `notnull` are specific to Redshift.
+`isnull` and `notnull` do not perform the same functionality in all flavours of SQL.
 
 <br>
 
