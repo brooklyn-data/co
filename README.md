@@ -7,7 +7,7 @@
   - [Looker modeling PR template](pr_templates/looker_modeling_pr.md)
 
 # Contributing
-If you would like to contribute to this repository, please raise an issue or reach out to someone from Brooklyn Data Co (BDC) about contributing.
+If you'd like to use our style guides in your own organization, feel free to fork this repo and modify the guides however you'd like!
 
 # Clean Code Committee
 
