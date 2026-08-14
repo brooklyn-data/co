@@ -7,7 +7,7 @@ _Summarize the goal of your work and what motivated it._
 
 ## Validation
 - _Describe the validation process underwent to validate the changes_
-- _If applicable, include any validation queries or dbt execution commands completed_
+- _If dbt models were added or updated in this PR, include the queries below used to validate those changes_
 
 <details>
   <summary>SQL validation queries</summary>
